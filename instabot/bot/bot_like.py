@@ -1,5 +1,4 @@
 from tqdm import tqdm
-import random
 from . import limits
 from . import delay
 
@@ -24,7 +23,8 @@ def like_medias(self, medias):
     for media in tqdm(medias):
         if not self.like(media):
             delay.error_delay(self)
-            broken_items.append(media)
+            broken_items = medias[medias.index(media):]
+            break
     self.logger.info("DONE: Total liked %d medias." % self.total_liked)
     return broken_items
 
@@ -46,8 +46,7 @@ def like_user(self, user_id, amount=None):
         self.logger.info(
             "None medias recieved: account is closed or medias have been filtered.")
         return False
-    size = min(len(medias), amount)
-    return self.like_medias(random.sample(medias, size))
+    return self.like_medias(medias[:amount])
 
 
 def like_users(self, user_ids, nlikes=None):
