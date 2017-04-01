@@ -129,6 +129,10 @@ class Bot(API):
 
         self.logger.info('Instabot Started')
 
+    def version(self):
+        from pip._vendor import pkg_resources
+        return next((p.version for p in pkg_resources.working_set if p.project_name.lower() == 'instabot'), "No match")
+
     def logout(self):
         save_checkpoint(self)
         super(self.__class__, self).logout()
@@ -145,9 +149,7 @@ class Bot(API):
     def prepare(self):
         storage = load_checkpoint(self)
         if storage is not None:
-            self.total_liked, self.total_unliked, self.total_followed, \
-                self.total_unfollowed, self.total_commented, self.total_blocked, \
-                self.total_unblocked, self.start_time = storage
+            self.total_liked, self.total_unliked, self.total_followed, self.total_unfollowed, self.total_commented, self.total_blocked, self.total_unblocked, self.total_requests, self.start_time = storage
         self.whitelist = list(
             filter(None, map(self.convert_to_user_id, self.whitelist)))
         self.blacklist = list(
@@ -168,6 +170,7 @@ class Bot(API):
             self.logger.info("Total blocked: %d" % self.total_blocked)
         if self.total_unblocked:
             self.logger.info("Total unblocked: %d" % self.total_unblocked)
+        self.logger.info("Total requests: %d" % self.total_requests)
 
     # getters
 
@@ -225,8 +228,8 @@ class Bot(API):
     def get_media_owner(self, media):
         return get_media_owner(self, media)
 
-    def get_user_likers(self, user_id):
-        return get_user_likers(self, user_id)
+    def get_user_likers(self, user_id, media_count=10):
+        return get_user_likers(self, user_id, media_count)
 
     def convert_to_user_id(self, usernames):
         return convert_to_user_id(self, usernames)
